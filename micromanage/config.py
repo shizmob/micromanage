@@ -13,7 +13,7 @@ stream_mount = 'main.mp3'
 #### Recon options ####
 
 # File to write metadata to.
-meta_file = '/serve/www/salt-salty-studios.com/shiz/radio/info.json'
+meta_file = 'info.json'
 # Time in seconds between metadata updates.
 meta_update_interval = 5
 # Maximum metadata entries.
@@ -23,7 +23,7 @@ meta_cap = 6
 
 ## Song options.
 # Music directory to AFK stream songs from.
-music_source = '/Users/mark/Music'
+music_source = '/home/www/r-a-dio/res/music'
 # Song database file. SQLite 3 database format.
 music_db = 'music.sqlite3'
 
@@ -40,7 +40,7 @@ stream_samplerate = 44100
 #### IRC bot options ####
 
 # IRC nickname.
-irc_nick = 'lastbot'
+irc_nick = 'sigma-delta'
 # IRC nickserv password, if any.
 irc_pass = None
 # IRC server host to connect to.
@@ -50,7 +50,7 @@ irc_port = 6697
 # Enable TLS (formerly known as SSL) or not.
 irc_tls = True
 # IRC channels to join to.
-irc_channels = [ '#lastradio' ]
+irc_channels = [ '#sigmaloop' ]
 # IRC command character.
 irc_command_char = '$'
 # Administrative users. Need to be registered nicknames.

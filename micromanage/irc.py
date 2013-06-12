@@ -79,8 +79,11 @@ class Bot(irc.IRCClient):
             command = message.split(' ', 2)[0]
 
             if command in handlers:
-                for handler in hndlrs:
-                    handler(self, user, channel, message)
+                for handler in handlers[command]:
+                    try:
+                        handler(self, user, channel, message)
+                    except Exception as e:
+                        self.respond(user, channel, '{b}Error while executing {cmd}:{b} {error}'.format(error=e, cmd=handler, **commands))
 
 
 class BotFactory(protocol.ClientFactory):
@@ -97,4 +100,4 @@ class IRCClientThread(threading.Thread):
             reactor.connectSSL(config.irc_host, config.irc_port, fac, ssl.ClientContextFactory())
         else:
             reactor.connectTCP(config.irc_host, config.irc_port, fac)
-        reactor.run()
+        reactor.run(installSignalHandlers=0)

@@ -14,8 +14,9 @@ class MetaUpdateThread(threading.Thread):
 
         while True:
             # Fetch XML metadata.
-            with urllib.urlopen('http://{host}:{port}/{mount}.xspf'.format(host=config.stream_host, port=config.stream_port, mount=config.stream_mount)) as f:
-                xml_data = f.read()
+            url = 'http://{host}:{port}/{mount}.xspf'.format(host=config.stream_host, port=config.stream_port, mount=config.stream_mount)
+            req = urllib.urlopen(url)
+            xml_data = req.read()
 
             # Parse and extract song.
             data = bs4.BeautifulSoup(xml_data, [ 'lxml', 'xml' ])
