@@ -83,7 +83,7 @@ class Bot(irc.IRCClient):
                     try:
                         handler(self, user, channel, message)
                     except Exception as e:
-                        self.respond(user, channel, '{b}Error while executing {cmd}:{b} {error}'.format(error=e, cmd=handler, **commands))
+                        self.respond(user, channel, '{b}Error while executing {cmd}:{b} {error}'.format(error=e, cmd=handler.__name__, **commands))
 
 
 class BotFactory(protocol.ClientFactory):

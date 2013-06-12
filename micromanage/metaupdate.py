@@ -26,7 +26,7 @@ class MetaUpdateThread(threading.Thread):
                 song = None
 
             # Did we encounter a new song? Push it.
-            if song and (not last or history[0] != song):
+            if song and (not history or history[0] != song):
                 history.insert(0, song)
                 # Cap history..
                 history = history[:config.meta_cap]
