@@ -4,9 +4,11 @@
 import sys
 import irc
 import metaupdate
+import twisted.internet.reactor
 
 def quit(bot, user, channel, message):
     if bot.is_admin(user):
+        twisted.internet.reactor.stop()
         sys.exit(0)
 irc.add_handler('quit', quit)
 
