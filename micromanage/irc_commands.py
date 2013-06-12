@@ -4,6 +4,11 @@
 import irc
 import metaupdate
 
+def quit(bot, user, channel, message):
+    if bot.is_admin(user):
+        bot.quit()
+irc.add_handler('quit', quit)
+
 def now_playing(bot, user, channel, message):
     song = metaupdate.metadata['last'][0]
     response = 'now playing: {b}{song}{b}'.format(song, **irc.commands)

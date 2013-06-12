@@ -66,6 +66,10 @@ class Bot(irc.IRCClient):
         for channel in config.irc_channels:
             self.join(channel)
 
+    def is_admin(self, user):
+        # TODO: Implement.
+        return True
+
     def respond(self, user, channel, message):
         if channel == self.nickname:
             self.msg(user, message)
