@@ -2,7 +2,7 @@ import config
 import time
 import threading
 import json
-import urllib.request
+import urllib
 import bs4
 
 metadata = None
@@ -14,7 +14,7 @@ class MetaUpdateThread(threading.Thread):
 
         while True:
             # Fetch XML metadata.
-            with urllib.request.urlopen('http://{host}:{port}/{mount}.xspf'.format(host=config.stream_host, port=config.stream_port, mount=config.stream_mount)) as f:
+            with urllib.urlopen('http://{host}:{port}/{mount}.xspf'.format(host=config.stream_host, port=config.stream_port, mount=config.stream_mount)) as f:
                 xml_data = f.read()
 
             # Parse and extract song.
