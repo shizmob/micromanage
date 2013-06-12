@@ -21,7 +21,7 @@ class MetaUpdateThread(threading.Thread):
             # Parse and extract song.
             data = bs4.BeautifulSoup(xml_data, [ 'lxml', 'xml' ])
             try:
-                song = data.trackList.track.title
+                song = data.trackList.track.title.string
             except:
                 song = None
 
