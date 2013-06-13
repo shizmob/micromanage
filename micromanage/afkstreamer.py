@@ -11,7 +11,7 @@ import event
 import meta
 import stream
 
-streaming = False
+streaming = threading.Event()
 queue = []
 
 
@@ -19,11 +19,11 @@ queue = []
 
 def start_streaming():
     global streaming
-    streaming = True
+    streaming.set()
 
 def stop_streaming():
     global streaming
-    streaming = False
+    streaming.clear()
 
 def schedule_stop(delay):
     t = threading.Timer(delay, lambda: event.emit('afkstream.stop'))
@@ -64,11 +64,11 @@ class AFKStreamThread(threading.Thread):
 
             # Nobody currently streaming? Let's AFK stream!
             if not stream.is_playing(data):
-                streaming = True
+                streaming.set()
             
             conn = None
             # Enter streaming loop if we're streaming.
-            while streaming:
+            while streaming.is_set():
                 # Setup connection.
                 if not conn:
                     conn = stream.create_connection()
@@ -77,7 +77,7 @@ class AFKStreamThread(threading.Thread):
                 # Take items from queue and stream them.
                 while streaming and queue:
                     song = queue.pop()
-                    stream.stream_song(conn, song)
+                    stream.stream_song(conn, song, cond=streaming)
 
                 # If we're still streaming that means the queue has been exhausted. Refill it.
                 if streaming:

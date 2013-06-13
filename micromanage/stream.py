@@ -110,10 +110,9 @@ def create_encoder(song):
     encoder = subprocess.Popen(cmdline, stdout=subprocess.PIPE)
     return encoder
 
-def stream_song(conn, song):
+def stream_song(conn, song, cond=None):
     """ Stream a song file to source stream connection. """
-    global streaming
-
+ 
     # Retrieve tags and notify stream.
     tags = meta.extract_song_tags(song)
     name = meta.extract_song_name(song, tags)
@@ -125,7 +124,7 @@ def stream_song(conn, song):
     encoder = create_encoder(song)
 
     # Start reading and sending data.
-    while streaming:
+    while cond is None or cond.is_set():
         data = encoder.stdout.read(config.stream_buffer_size)
         if len(data) == 0:
             break
