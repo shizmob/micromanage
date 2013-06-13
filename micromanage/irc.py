@@ -69,7 +69,7 @@ def add_handler(command, handler):
 
 class Bot(irc.IRCClient):
     def __init__(self):
-        super(irc.IRCClient, self).__init__()
+        irc.IRCClient.__init__()
         self.nick_status = {}
 
     def signedOn(self):
