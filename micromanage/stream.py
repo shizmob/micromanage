@@ -110,7 +110,7 @@ def create_encoder(song):
     encoder = subprocess.Popen(cmdline, stdout=subprocess.PIPE)
     return encoder
 
-def stream_song(conn, song, cond=None):
+def stream_song(conn, song, cond=None, announce_event=None):
     """ Stream a song file to source stream connection. """
  
     # Retrieve tags and notify stream.
@@ -118,7 +118,8 @@ def stream_song(conn, song, cond=None):
     name = meta.extract_song_name(song, tags)
     conn.metadata = { 'song': name, 'charset': 'UTF-8' }
     # Also notify other interested parties.
-    event.emit('afkstream.playing', name)
+    if announce_event:
+        event.emit(announce_event, name)
 
     # Setup an encoder to stream format.
     encoder = create_encoder(song)
