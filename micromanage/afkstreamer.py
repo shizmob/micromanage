@@ -75,12 +75,12 @@ class AFKStreamThread(threading.Thread):
                     event.emit('afkstream.started')
 
                 # Take items from queue and stream them.
-                while streaming and queue:
+                while streaming.is_set() and queue:
                     song = queue.pop()
                     stream.stream_song(conn, song, cond=streaming)
 
                 # If we're still streaming that means the queue has been exhausted. Refill it.
-                if streaming:
+                if streaming.is_set():
                     queue = fetch_songs(config.music_source, config.music_extensions, config.queue_refill_rate)
 
             # Close AFK stream connection.
