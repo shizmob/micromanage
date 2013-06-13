@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # micromanage irc module.
 
-import sys
+import os
 import threading
 
 from twisted.words.protocols import irc
@@ -98,7 +98,7 @@ class Bot(irc.IRCClient):
                     try:
                         handler(self, user, channel, message)
                     except Exception as e:
-                        self.respond(user, channel, '{b}Error while executing {cmd}:{b} {error}'.format(error=e, cmd=handler.__name__, **commands))
+                        self.respond(user, channel, '{b}Error while executing {cmd}:{b} {type} - {error}'.format(type=e.__class__.__name__, error=e, cmd=handler.__name__, **commands))
 
 
 class BotFactory(protocol.ClientFactory):
@@ -123,4 +123,4 @@ class IRCClientThread(threading.Thread):
 
         reactor.run(installSignalHandlers=0)
         # If reactor stopped here, we got a quit signal. Kill program.
-        sys.exit(0)
+        os._exit(0)

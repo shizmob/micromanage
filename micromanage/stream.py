@@ -3,6 +3,7 @@
 from __future__ import division
 
 import logging
+import os
 import os.path as path
 import random
 import subprocess
@@ -24,7 +25,7 @@ logger = logging.getLogger('micromanage')
 class AFKStreamThread(threading.Thread):
     def run(self):
         global streaming, queue, logger
-        stream_url = 'http://{host}:{port}/{mount}'.format(config.stream_host, config.stream_port, config.stream_mount)
+        stream_url = 'http://{host}:{port}/{mount}'.format(host=config.stream_host, port=config.stream_port, mount=config.stream_mount)
 
         def start_streaming():
             global streaming
@@ -70,7 +71,6 @@ class AFKStreamThread(threading.Thread):
                     conn.description = 'Streaming while DJs are offline.'
                     conn.genre = 'Various'
                     conn.url = ''
-                    conn.public = 1
                     conn.audio_info = {
                         pylibshout.SHOUT_AI_BITRATE: config.stream_bitrate,
                         pylibshout.SHOUT_AI_SAMPLERATE: config.stream_samplerate,
@@ -107,8 +107,8 @@ class AFKStreamThread(threading.Thread):
                     if config.stream_format == 'mp3':
                         cmdline = [
                             config.lame_path, '--silent', '--replaygain-fast',
-                            '--cbr', '-b', config.stream_bitrate,
-                            '--resample', config.stream_samplerate / 1000,
+                            '--cbr', '-b', str(config.stream_bitrate),
+                            '--resample', str(config.stream_samplerate / 1000),
                             song, '-'
                         ]
                     # Create encoder process.

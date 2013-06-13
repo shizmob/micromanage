@@ -30,6 +30,21 @@ class MetaUpdateThread(threading.Thread):
             except:
                 song = None
 
+            # Parse annotations.
+            annotations = {}
+            if data.annotation:
+                for line in data.annotation.string.split('\n'):
+                    key, value = line.split(':', 2)
+                    annotations[key] = value.strip()
+
+                metadata['listeners'] = int(annotations['Current Listeners'])
+                metadata['max_listeners'] = int(annotations['Peak Listeners'])
+            else:
+                if 'listeners' not in metadata:
+                    metadata['listeners'] = 0
+                if 'max_listeners' not in metadata:
+                    metadata['max_listeners'] = 0
+
             # Did we encounter a new song? Push it.
             if song and (not history or history[0] != song):
                 history.insert(0, song)
@@ -38,11 +53,14 @@ class MetaUpdateThread(threading.Thread):
                 
                 # Write to data file.
                 with open(config.meta_file, 'r') as f:
-                    metadata = json.load(f)
+                    jsonmeta = json.load(f)
+                    metadata.update(jsonmeta)
 
                 metadata['last'] = history
+                jsonmeta['last'] = history
+
                 with open(config.meta_file, 'w') as f:
-                    json.dump(metadata, f)
+                    json.dump(jsonmeta, f)
 
                 event.emit('stream.playing', song)
 

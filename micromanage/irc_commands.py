@@ -1,8 +1,10 @@
 #!/usr/bin/env python3
+# coding: utf-8
 # micromanage standard irc commands
 
 import sys
 
+import config
 import irc
 import event
 
@@ -12,6 +14,24 @@ def quit(bot, user, channel, message):
     if bot.is_admin(user):
         event.emit('irc.quit')
 irc.add_handler('quit', quit)
+
+def url(bot, user, channel, message):
+    url = 'http://{host}:{port}/{mount}'.format(host=config.stream_host, port=config.stream_port, mount=config.stream_mount)
+    response = 'stream url: {b}{url}{b}'.format(url=url, **irc.commands)
+    bot.respond(user, channel, response)
+irc.add_handler('url', url)
+
+def show(bot, user, channel, message):
+    show = 'current show: {b}{show}{b}'.format(show=metaupdate.metadata['current'], **irc.commands)
+    if metaupdate.metadata['streamer']:
+        show += ' with {b}{streamer}{b}'.format(streamer=metaupdate.metadata['streamer'], **irc.commands)
+    bot.respond(user, channel, show)
+irc.add_handler('show', show)
+
+def listeners(bot, user, channel, message):
+    response = 'current listeners: {b}{lst}{b} / peak listeners: {b}{plst}{b}'.format(lst=metaupdate.metadata['listeners'], plst=metaupdate.metadata['max_listeners'], **irc.commands)
+    bot.respond(user, channel, response)
+irc.add_handler('listeners', listeners)
 
 def now_playing(bot, user, channel, message):
     song = now_playing.song
