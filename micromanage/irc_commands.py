@@ -12,6 +12,15 @@ metadata = {}
 
 ### IRC command handlers.
 
+def identify(bot, user, channel, password):
+    if user in config.irc_admins:
+        dj_nick, pass = config.irc_admins[user]
+        if password == pass:
+            bot.admins.append(user)
+            bot.respond('identification {b}successful{b}'.format(**irc.commands))
+            return
+    bot.respond('identification {b}failed{b}'.format(**irc.commands))
+
 def quit(bot, user, channel, message):
     if bot.is_admin(user):
         event.emit('irc.quit')
@@ -47,6 +56,7 @@ def stop_stream(bot, user, channel, message):
         event.emit('afkstream.start')
 
 
+irc.add_handler('identify', identify)
 irc.add_handler('quit', quit)
 irc.add_handler('url', url)
 irc.add_handler('show', show)

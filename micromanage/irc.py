@@ -69,7 +69,7 @@ def add_handler(command, handler):
 
 class Bot(irc.IRCClient):
     def __init__(self):
-        self.nick_status = {}
+        self.admins = []
 
     def signedOn(self):
         # Identify.
@@ -84,25 +84,25 @@ class Bot(irc.IRCClient):
         # Clear nick registration status.
         user = user.split('!', 1)[0]
         if user in self.nick_status:
-            self.nick_status.remove(user)
+            self.admins.remove(user)
 
     def userQuit(self, user, message):
         # Clear nick registration status.
         user = user.split('!', 1)[0]
         if user in self.nick_status:
-            self.nick_status.remove(user)
+            self.admins.remove(user)
 
     def userKicked(self, user, channel, kicker, message):
         # Clear nick registration status.
         user = user.split('!', 1)[0]
         if user in self.nick_status:
-            self.nick_status.remove(user)
+            self.admins.remove(user)
 
     def userRenamed(self, user, new):
         # Clear nick registration status.
         user = user.split('!', 1)[0]
         if user in self.nick_status:
-            self.nick_status.remove(user)
+            self.admins.remove(user)
 
     def privmsg(self, user, channel, message):
         global handlers
@@ -114,37 +114,13 @@ class Bot(irc.IRCClient):
             if command in handlers:
                 for handler in handlers[command]:
                     try:
-                        handler(self, user, channel, message)
+                        handler(self, user, channel, *message.split(' ')[1:])
                     except Exception as e:
                         self.respond(user, channel, '{b}Error while executing {cmd}:{b} {type} - {error}'.format(type=e.__class__.__name__, error=e, cmd=handler.__name__, **commands))
 
-    def irc_unknown(self, server, code, params):
-        # Check nickname registration status.
-        if code == '307':
-            message = params[0]
-            target, user, contents = message
-
-            if 'identified' in contents:
-                self.nick_status[user] = True
-        # If we reached the end of a whois status with no registered line, it's not registered.
-        elif code == 'RPL_ENDOFWHOIS':
-            message = params[0]
-            target, user, contents = message
-            if user not in self.nick_status:
-                self.nick_status[user] = False
-
 
     def is_admin(self, user):
-        if user not in self.nick_status:
-            self.whois(user)
-
-        # Wait until we have fetched registration status for a maximum of 3 seconds.
-        elapsed = 0.0
-        while user not in self.nick_status and elapsed < 3.0:
-            time.sleep(0.1)
-            elapsed += 0.1
-
-        return self.nick_status[user]
+        return user in self.admins
 
     def respond(self, user, channel, message):
         if channel == self.nickname:
