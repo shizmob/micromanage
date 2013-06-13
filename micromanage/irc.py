@@ -83,25 +83,25 @@ class Bot(irc.IRCClient):
     def userLeft(self, user, channel):
         # Clear nick registration status.
         user = user.split('!', 1)[0]
-        if user in self.nick_status:
+        if user in self.admins:
             self.admins.remove(user)
 
     def userQuit(self, user, message):
         # Clear nick registration status.
         user = user.split('!', 1)[0]
-        if user in self.nick_status:
+        if user in self.admins:
             self.admins.remove(user)
 
     def userKicked(self, user, channel, kicker, message):
         # Clear nick registration status.
         user = user.split('!', 1)[0]
-        if user in self.nick_status:
+        if user in self.admins:
             self.admins.remove(user)
 
     def userRenamed(self, user, new):
         # Clear nick registration status.
         user = user.split('!', 1)[0]
-        if user in self.nick_status:
+        if user in self.admins:
             self.admins.remove(user)
 
     def privmsg(self, user, channel, message):

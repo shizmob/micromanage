@@ -4,6 +4,7 @@
 import afkstreamer
 import config
 import event
+import fallback
 import irc
 import irc_commands
 import meta

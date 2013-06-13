@@ -7,6 +7,7 @@ def main():
     threads.append(irc.IRCClientThread())
     threads.append(metaupdater.MetaUpdateThread())
     threads.append(afkstreamer.AFKStreamThread())
+    threads.append(fallback.FallbackStreamThread())
 
     # Start threads.
     [ thread.start() for thread in threads ]

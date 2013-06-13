@@ -26,6 +26,8 @@ meta_cap = 6
 music_source = '/home/www/r-a-dio/res/music'
 # Music extensions.
 music_extensions = [ 'mp3', 'ogg' ]
+# The fallback song.
+fallback_song = '/home/www/r-a-dio/res/music/bright_slap_f.mp3'
 
 ## Stream host options.
 # Stream host when AFK streaming.
@@ -34,6 +36,8 @@ stream_input_host = 'stream.salty-salty-studios.com'
 stream_input_port = 1337
 # Stream mount when AFK streaming.
 stream_input_mount = 'main.mp3'
+# Stream mount when fallback streaming.
+stream_input_fallback_mount = 'fallback.mp3'
 # Stream user when AFK streaming.
 stream_input_user = 'source'
 # Stream password when AFK streaming.

@@ -60,33 +60,33 @@ def extract_listeners(annotations):
     return listeners, max_listeners
 
 
-def create_connection():
+def create_connection(host, port, mount, user, password, name='Stream', description='', bitrate=192, samplerate=44100, format='mp3'):
     """ Create source connection to stream. """
     conn = pylibshout.Shout()
 
     # Setup basic metadata.
-    conn.host = config.stream_input_host
-    conn.port = config.stream_input_port
-    conn.user = config.stream_input_user
-    conn.password = config.stream_input_pass
-    conn.mount = '/' + config.stream_input_mount
+    conn.host = host
+    conn.port = port
+    conn.user = user
+    conn.password = password
+    conn.mount = '/' + mount
 
-    conn.name = 'AFK streamer'
-    conn.description = 'Streaming while DJs are offline.'
-    conn.genre = 'Various'
+    conn.name = name
+    conn.description = description
+    conn.genre = genre
     conn.url = config.stream_host
     conn.audio_info = {
-        pylibshout.SHOUT_AI_BITRATE: config.stream_bitrate,
-        pylibshout.SHOUT_AI_SAMPLERATE: config.stream_samplerate,
+        pylibshout.SHOUT_AI_BITRATE: bitrate,
+        pylibshout.SHOUT_AI_SAMPLERATE: samplerate,
         pylibshout.SHOUT_AI_CHANNELS: 2,
-        pylibshout.SHOUT_AI_QUALITY: config.stream_bitrate
+        pylibshout.SHOUT_AI_QUALITY: bitrate,
     }
 
     conn.protocol = pylibshout.SHOUT_PROTOCOL_HTTP
-    if config.stream_format == 'mp3':
+    if format == 'mp3':
         conn.format = pylibshout.SHOUT_FORMAT_MP3
     else:
-        raise ValueError('Unknown stream format: {format}'.format(format=config.stream_format))
+        raise ValueError('Unknown stream format: {format}'.format(format=format))
 
     conn.open()
     return conn

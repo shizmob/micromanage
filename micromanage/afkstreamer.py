@@ -71,7 +71,17 @@ class AFKStreamThread(threading.Thread):
             while streaming.is_set():
                 # Setup connection.
                 if not conn:
-                    conn = stream.create_connection()
+                    conn = stream.create_connection(
+                        host=config.stream_input_host,
+                        port=config.stream_input_port,
+                        mount=config.stream_input_mount,
+                        user=config.stream_input_user,
+                        pass=config.stream_input_pass,
+                        name='AFK Streamer',
+                        description='Streaming while DJs are offline',
+                        bitrate=config.stream_bitrate,
+                        samplerate=config.stream_samplerate,
+                        format=config.stream_format)    
                     event.emit('afkstream.started')
 
                 # Take items from queue and stream them.
