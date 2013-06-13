@@ -56,7 +56,7 @@ class AFKStreamThread(threading.Thread):
                 # Setup connection.
                 if not conn:
                     logger.info('AFK stream starting.')
-                    event.emit('afsktream.started')
+                    event.emit('afkstream.started')
 
                     conn = pylibshout.Shout()
                     conn.host = config.stream_input_host
