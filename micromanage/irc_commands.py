@@ -6,6 +6,8 @@ import sys
 import irc
 import event
 
+### IRC command handlers.
+
 def quit(bot, user, channel, message):
     if bot.is_admin(user):
         event.emit('irc.quit')
@@ -28,6 +30,8 @@ def stop_stream(bot, user, channel, message):
         event.emit('afkstream.start')
 irc.add_handler('stopstream', stop_stream)
 
+
+### Event handlers.
 
 def afkstream_stop_scheduled(delay):
     msg = 'disconnecting AFK streamer after {b}{delay}{b} seconds.'.format(delay=delay, **irc.commands)
@@ -53,5 +57,5 @@ event.add_handler('afkstream.playing', afkstream_playing)
 
 def stream_playing(song):
     now_playing.song = song
-event.add_handler('stream.playing', song)
+event.add_handler('stream.playing', stream_playing)
 
