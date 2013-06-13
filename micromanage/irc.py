@@ -3,10 +3,12 @@
 
 import config
 import sys
+import event
 import threading
 from twisted.words.protocols import irc
 from twisted.internet import reactor, protocol, ssl
 
+bot = None
 handlers = {}
 commands = {
     # Bold.
@@ -99,9 +101,10 @@ class Bot(irc.IRCClient):
 
 class BotFactory(protocol.ClientFactory):
     def buildProtocol(self, addr):
-        b = Bot()
-        b.nickname = config.irc_nick
-        return b
+        global bot
+        bot = Bot()
+        bot.nickname = config.irc_nick
+        return bot
 
 class IRCClientThread(threading.Thread):
     def run(self):
@@ -111,6 +114,10 @@ class IRCClientThread(threading.Thread):
             reactor.connectSSL(config.irc_host, config.irc_port, fac, ssl.ClientContextFactory())
         else:
             reactor.connectTCP(config.irc_host, config.irc_port, fac)
+
+        def irc_quit():
+            reactor.stop()
+        event.add_handler('irc.quit', irc_quit)
 
         reactor.run(installSignalHandlers=0)
         # If reactor stopped here, we got a quit signal. Kill program.

@@ -4,13 +4,12 @@
 import sys
 import irc
 import metaupdate
-import stream
-import threading
+import event
 import twisted.internet.reactor
 
 def quit(bot, user, channel, message):
     if bot.is_admin(user):
-        twisted.internet.reactor.stop()
+        event.emit('irc.quit')
 irc.add_handler('quit', quit)
 
 def now_playing(bot, user, channel, message):
@@ -21,15 +20,33 @@ irc.add_handler('np', now_playing)
 
 def start_stream(bot, user, channel, message):
     if bot.is_admin(user):
-        t = threading.Timer(config.stream_disconnect_delay, lambda: setattr(stream, 'streaming', False))
-        t.start()
-        response = 'disconnecting AFK streamer after {b}{delay}{b} seconds.'.format(delay=config.stream_disconnect_delay, **irc.commands)
-        bot.respond(user, channel, response)
+        event.emit('afkstream.schedule_stop', config.stream_disconnect_delay)
 irc.add_handler('startstream', start_stream)
 
 def stop_stream(bot, user, channel, message):
     if bot.is_admin(user):
-        stream.streaming = True
-        response = 'reconnecting AFK streamer.'
-        bot.respond(user, channel, response)
+        event.emit('afkstream.start')
 irc.add_handler('stopstream', stop_stream)
+
+
+def afkstream_stop_scheduled(delay):
+    msg = 'disconnecting AFK streamer after {b}{delay}{b} seconds.'.format(delay=delay, **irc.commands)
+    for channel in config.irc_notification_channels:
+        irc.bot.msg(channel, msg)
+event.add_handler('afkstream.stop_scheduled', afkstream_stop_scheduled)
+
+def afkstream_started():
+    for channel in config.irc_notification_channels:
+        irc.bot.msg(channel, 'AFK streamer connected.')
+event.add_handler('afkstream.started', afkstream_started)
+
+def afkstream_stopped():
+    for channel in config.irc_notification_channels:
+        irc.bot.msg(channel, 'AFK streamer disconnected.')
+event.add_handler('afkstream.stopped', afkstream_stopped)
+
+def afkstream_playing(song):
+    msg = 'now starting: {b}{song}{b}'.format(song=song, **irc.commands)
+    for channel in config.irc_notification_channels:
+        irc.bot.msg(channel, msg)
+event.add_handler('afkstream.playing', afkstream_playing)

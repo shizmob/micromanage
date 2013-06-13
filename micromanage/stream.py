@@ -4,6 +4,7 @@ from __future__ import division
 
 import bs4
 import config
+import event
 import pylibshout
 import metaupdate
 import logging
@@ -24,6 +25,22 @@ class AFKStreamThread(threading.Thread):
         global streaming, queue, logger
         stream_url = 'http://{host}:{port}/{mount}'.format(config.stream_host, config.stream_port, config.stream_mount)
 
+        def start_streaming():
+            global streaming
+            streaming = True
+        event.add_handler('afkstream.start', start_streaming)
+
+        def stop_streaming():
+            global streaming
+            streaming = False
+        event.add_handler('afkstream.stop', stop_streaming)
+
+        def schedule_disconnect(delay):
+            t = threading.Timer(delay, lambda: event.emit('afkstream.stop'))
+            t.start()
+        event.add_handler('afkstream.schedule_stop', schedule_stop)
+
+
         while True:
             req = urllib.urlopen(stream_url + '.xspf')
             xml_data = req.read()
@@ -38,6 +55,8 @@ class AFKStreamThread(threading.Thread):
                 # Setup connection.
                 if not conn:
                     logger.info('AFK stream starting.')
+                    event.emit('afsktream.started')
+
                     conn = pylibshout.Shout()
                     conn.host = config.stream_input_host
                     conn.port = config.stream_input_port
@@ -79,6 +98,9 @@ class AFKStreamThread(threading.Thread):
                         metadata = path.basename(song).rsplit('.', 1)[0]
                     conn.metadata = { 'song': metadata, 'charset': 'UTF-8' }
 
+                    # Emit event.
+                    event.emit('afkstream.playing', metadata)
+
                     # Determine encoder path and options.
                     if config.stream_format == 'mp3':
                         cmdline = [
@@ -110,6 +132,7 @@ class AFKStreamThread(threading.Thread):
             # Close AFK stream connection.
             if conn:
                 logger.info('AFK stream stopping.')
+                event.emit('afkstream.stopped')
                 conn.close()
 
             # Sleep for a bit.

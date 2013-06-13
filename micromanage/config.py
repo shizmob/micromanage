@@ -69,6 +69,8 @@ irc_port = 6697
 irc_tls = True
 # IRC channels to join to.
 irc_channels = [ '#sigmaloop' ]
+# IRC channels to notify.
+irc_notification_channels = [ '#sigmaloop' ]
 # IRC command character.
 irc_command_char = '$'
 # Administrative users. Need to be registered nicknames.
