@@ -35,7 +35,7 @@ class AFKStreamThread(threading.Thread):
             streaming = False
         event.add_handler('afkstream.stop', stop_streaming)
 
-        def schedule_disconnect(delay):
+        def schedule_stop(delay):
             t = threading.Timer(delay, lambda: event.emit('afkstream.stop'))
             t.start()
         event.add_handler('afkstream.schedule_stop', schedule_stop)
