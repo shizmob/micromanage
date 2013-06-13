@@ -34,7 +34,7 @@ def url(bot, user, channel, *args):
 
 def show(bot, user, channel, *args):
     show = 'current show: {b}{show}{b}'.format(show=metadata['current'], **irc.commands)
-    if metaupdate.metadata['streamer']:
+    if metadata['streamer']:
         show += ' with {b}{streamer}{b}'.format(streamer=metadata['streamer'], **irc.commands)
     bot.respond(user, channel, show)
 
