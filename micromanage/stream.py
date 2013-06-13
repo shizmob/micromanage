@@ -10,6 +10,7 @@ import logging
 import os.path as path
 import random
 import subprocess
+import tagpy
 import time
 import threading
 import urllib
@@ -51,7 +52,7 @@ class AFKStreamThread(threading.Thread):
                     conn.public = 1
                     conn.audio_info = {
                         pylibshout.SHOUT_AI_BITRATE: config.stream_bitrate,
-                        pylibshout.SHOUT_AI_SAMPLERATE: config.stream_samplerate
+                        pylibshout.SHOUT_AI_SAMPLERATE: config.stream_samplerate,
                         pylibshout.SHOUT_AI_CHANNELS: 2,
                         pylibshout.SHOUT_AI_QUALITY: config.stream_bitrate
                     }
@@ -64,7 +65,19 @@ class AFKStreamThread(threading.Thread):
                 # Take items from queue and stream them.
                 while streaming and queue:
                     song = queue.pop()
-                    logger.info('Streaming {}.'.format(song)
+                    logger.info('Streaming {}.'.format(song))
+
+                    # Retrieve tags.
+                    meta = tagpy.FileRef(song)
+                    tags = meta.tag()
+
+                    if tags.artist and tags.title:
+                        metadata = '{} - {}'.format(tags.artist, tags.title)
+                    elif tags.title:
+                        metadata = tags.title
+                    else:
+                        metadata = song.rsplit('.', 1)[0]
+                    conn.metadata = { 'song': metadata, 'charset': 'UTF-8' }
 
                     # Determine encoder path and options.
                     if config.stream_format == 'mp3':
@@ -96,6 +109,7 @@ class AFKStreamThread(threading.Thread):
 
             # Close AFK stream connection.
             if conn:
+                logger.info('AFK stream stopping.')
                 conn.close()
 
             # Sleep for a bit.
