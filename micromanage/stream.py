@@ -156,13 +156,13 @@ def stream_song(conn, song):
 def fetch_songs(source, extensions, count):
     """ Fetch a certain amount of random songs to play. """
     # Create file filter.
-    filter = re.compile('(' + '|'.join(re.escape('.{ext}'.format(ext=ext) for ext in extensions)) + ')$')
+    filter = re.compile('(' + '|'.join(re.escape('.{ext}'.format(ext=ext)) for ext in extensions) + ')$', re.IGNORECASE)
 
     # List all files in source directory.
     all_songs = []
     for basedir, _, files in os.walk(config.music_source):
         # Filter songs with filter.
-        all_songs.extend(path.join(basedir, file) for file in files if filter.match(file))
+        all_songs.extend(path.join(basedir, file) for file in files if filter.search(file))
 
     # Create random list of uniqe songs.
     songs = random.sample(all_songs, config.queue_refill_rate)
@@ -177,7 +177,7 @@ class AFKStreamThread(threading.Thread):
         stream_url = 'http://{host}:{port}/{mount}'.format(host=config.stream_host, port=config.stream_port, mount=config.stream_mount)
 
         while True:
-            data = fetch_stream_data(url)
+            data = fetch_stream_data(stream_url)
 
             # Nobody currently streaming? Let's AFK stream!
             if not stream_is_playing(data):

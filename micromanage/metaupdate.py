@@ -85,7 +85,7 @@ class MetaUpdateThread(threading.Thread):
                 metadata['listeners'] = 0
 
             if max_listeners is not None:
-                metadata['max_listeners'] = max_listeners:
+                metadata['max_listeners'] = max_listeners
             elif 'max_listeners' not in metadata:
                 metadata['max_listeners'] = 0
 
