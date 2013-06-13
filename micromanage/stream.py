@@ -76,7 +76,7 @@ class AFKStreamThread(threading.Thread):
                     elif tags.title:
                         metadata = tags.title
                     else:
-                        metadata = song.rsplit('.', 1)[0]
+                        metadata = path.basename(song).rsplit('.', 1)[0]
                     conn.metadata = { 'song': metadata, 'charset': 'UTF-8' }
 
                     # Determine encoder path and options.
