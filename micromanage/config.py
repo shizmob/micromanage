@@ -73,5 +73,5 @@ irc_channels = [ '#sigmaloop' ]
 irc_notification_channels = [ '#sigmaloop' ]
 # IRC command character.
 irc_command_char = '$'
-# Administrative users. Need to be registered nicknames.
-irc_admins = [ 'Shiz', 'Delta_Kurshiva' ]
+# Administrative users. Need to be registered nicknames. A nickname -> DJ name mapping.
+irc_admins = { 'Shiz': 'Shiz', 'Delta_Kurshiva': 'Delta' }

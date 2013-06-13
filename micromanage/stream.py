@@ -135,10 +135,14 @@ def create_encoder(song):
 
 def stream_song(conn, song):
     """ Stream a song file to source stream connection. """
+    global streaming
+
     # Retrieve tags and notify stream.
     tags = extract_song_tags(song)
     name = extract_song_name(song, tags)
     conn.metadata = { 'song': name, 'charset': 'UTF-8' }
+    # Also notify other interested parties.
+    event.emit('afkstream.playing', name)
 
     # Setup an encoder to stream format.
     encoder = create_encoder(song)
@@ -146,7 +150,7 @@ def stream_song(conn, song):
     # Start reading and sending data.
     while streaming:
         data = encoder.stdout.read(config.stream_buffer_size)
-        if len(data) == 0:
+        if not data:
             break
                         
         conn.send(data)
