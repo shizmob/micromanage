@@ -1,9 +1,14 @@
-import config
+#!/usr/bin/env python3
+# micromanage metadata update module.
 import time
 import threading
 import json
 import urllib
+
 import bs4
+
+import config
+import event
 
 metadata = None
 
@@ -38,6 +43,8 @@ class MetaUpdateThread(threading.Thread):
                 metadata['last'] = history
                 with open(config.meta_file, 'w') as f:
                     json.dump(metadata, f)
+
+                event.emit('stream.playing', song)
 
             # And sleep.
             time.sleep(config.meta_update_interval)

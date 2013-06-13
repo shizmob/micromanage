@@ -1,12 +1,14 @@
 #!/usr/bin/env python3
 # micromanage irc module.
 
-import config
 import sys
-import event
 import threading
+
 from twisted.words.protocols import irc
 from twisted.internet import reactor, protocol, ssl
+
+import config
+import event
 
 bot = None
 handlers = {}

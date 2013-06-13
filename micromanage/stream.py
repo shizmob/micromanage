@@ -2,19 +2,20 @@
 # micromanage AFK streamer.
 from __future__ import division
 
-import bs4
-import config
-import event
-import pylibshout
-import metaupdate
 import logging
 import os.path as path
 import random
 import subprocess
-import tagpy
 import time
 import threading
 import urllib
+
+import bs4
+import pylibshout
+import tagpy
+
+import config
+import event
 
 streaming = False
 queue = []
