@@ -15,7 +15,7 @@ metadata = {}
 
 def fetch_stream_data(url):
     # Retrieve XML data.
-    req = urllib.urlopen(url)
+    req = urllib.urlopen(url + '.xspf')
     xml_data = req.read()
 
     # Parse and extract data.
@@ -70,7 +70,7 @@ class MetaUpdateThread(threading.Thread):
 
         while True:
             # Fetch XML metadata.
-            url = 'http://{host}:{port}/{mount}.xspf'.format(host=config.stream_host, port=config.stream_port, mount=config.stream_mount)
+            url = 'http://{host}:{port}/{mount}'.format(host=config.stream_host, port=config.stream_port, mount=config.stream_mount)
 
             # Extract data from XML.
             data = fetch_stream_data(url)

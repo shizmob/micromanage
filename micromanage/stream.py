@@ -49,7 +49,7 @@ event.add_handler('afkstream.schedule_stop', schedule_stop)
 def fetch_stream_data(url):
     """ Create parsed data structure from stream URL. """
     # Retrieve XML data.
-    req = urllib.urlopen(url)
+    req = urllib.urlopen(url + '.xspf')
     xml_data = req.read()
 
     # Parse and extract data.
@@ -173,7 +173,7 @@ def fetch_songs(source, extensions, count):
 
 class AFKStreamThread(threading.Thread):
     def run(self):
-        global streaming, queue, logger
+        global streaming, queue
         stream_url = 'http://{host}:{port}/{mount}'.format(host=config.stream_host, port=config.stream_port, mount=config.stream_mount)
 
         while True:
