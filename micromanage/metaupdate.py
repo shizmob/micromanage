@@ -10,7 +10,7 @@ import bs4
 import config
 import event
 
-metadata = None
+metadata = {}
 
 class MetaUpdateThread(threading.Thread):
     def run(self):
