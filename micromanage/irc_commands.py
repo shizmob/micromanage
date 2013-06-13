@@ -13,13 +13,15 @@ metadata = {}
 ### IRC command handlers.
 
 def identify(bot, user, channel, password, *args):
+    message = 'identification {b}failed{b}'.format(**irc.commands)
+
     if user in config.irc_admins:
         dj_nick, dj_pass = config.irc_admins[user]
         if password == dj_pass:
             bot.admins.append(user)
-            bot.respond('identification {b}successful{b}'.format(**irc.commands))
-            return
-    bot.respond('identification {b}failed{b}'.format(**irc.commands))
+            message = 'identification {b}successful{b}'.format(**irc.commands)
+
+    bot.respond(user, channel, message)
 
 def quit(bot, user, channel, *args):
     if bot.is_admin(user):
