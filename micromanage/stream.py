@@ -1,50 +1,21 @@
 #!/usr/bin/env python
-# micromanage AFK streamer.
+# micromanage streaming functionality.
 from __future__ import division
 
-import os
-import os.path as path
-import random
-import re
 import subprocess
-import time
 import threading
 import urllib
 
 import bs4
 import pylibshout
-import tagpy
 
 import config
 import event
-
-streaming = False
-queue = []
-
-
-### Events.
-
-def start_streaming():
-    global streaming
-    streaming = True
-
-def stop_streaming():
-    global streaming
-    streaming = False
-
-def schedule_stop(delay):
-    t = threading.Timer(delay, lambda: event.emit('afkstream.stop'))
-    t.start()
-    event.emit('afkstream.stop_scheduled', delay)
-
-event.add_handler('afkstream.start', start_streaming)
-event.add_handler('afkstream.stop', stop_streaming)
-event.add_handler('afkstream.schedule_stop', schedule_stop)
-
+import meta
 
 ### Functions.
 
-def fetch_stream_data(url):
+def fetch_data(url):
     """ Create parsed data structure from stream URL. """
     # Retrieve XML data.
     req = urllib.urlopen(url + '.xspf')
@@ -54,11 +25,42 @@ def fetch_stream_data(url):
     data = bs4.BeautifulSoup(xml_data, [ 'lxml', 'xml' ])
     return data
 
-def stream_is_playing(data):
+def is_playing(data):
     """ Return whether or not something is currently playing on the stream. """
     return data.track and data.track.title
 
-def create_stream_connection():
+def extract_song(data):
+    """ Extract current song from stream XML. """
+    try:
+        song = data.trackList.track.title.string
+    except:
+        song = None
+    return song
+
+def extract_annotations(data):
+    """ Extract annotations from stream XML. """
+    annotations = {}
+
+    if data.annotation:
+        for line in data.annotation.string.split('\n'):
+            key, value = line.split(':', 2)
+            annotations[key] = value.strip()
+
+    return annotations
+
+def extract_listeners(annotations):
+    listeners = None
+    max_listeners = None
+
+    if 'Current Listeners' in annotations:
+        listeners = annotations['Current Listeners']
+    if 'Peak Listeners' in annotations:
+        max_listeners = annotations['Peak Listeners']
+
+    return listeners, max_listeners
+
+
+def create_connection():
     """ Create source connection to stream. """
     conn = pylibshout.Shout()
 
@@ -89,29 +91,6 @@ def create_stream_connection():
     conn.open()
     return conn
 
-
-def extract_song_tags(song):
-    """ Extract metadata tags structure from song file. """
-    meta = tagpy.FileRef(song)
-    return meta.tag()
-
-def extract_song_name(song, tags):
-    """ Extract human-readable song name from song file and tags. """
-    metadata = None
-
-    # Try $artist - $title.
-    if tags.artist and tags.title:
-        metadata = '{} - {}'.format(tags.artist, tags.title)
-    # Or, just $title.
-    elif tags.title:
-        metadata = tags.title
-    # Else, fall back to the file name.
-    else:
-        metadata = path.basename(song).rsplit('.', 1)[0]
-
-    return metadata
-
-
 def create_encoder(song):
     """ Create and start an encoder for song file. """
     # Determine encoder path and options.
@@ -136,8 +115,8 @@ def stream_song(conn, song):
     global streaming
 
     # Retrieve tags and notify stream.
-    tags = extract_song_tags(song)
-    name = extract_song_name(song, tags)
+    tags = meta.extract_song_tags(song)
+    name = meta.extract_song_name(song, tags)
     conn.metadata = { 'song': name, 'charset': 'UTF-8' }
     # Also notify other interested parties.
     event.emit('afkstream.playing', name)
@@ -154,58 +133,3 @@ def stream_song(conn, song):
         conn.send(data)
         conn.sync()
 
-
-def fetch_songs(source, extensions, count):
-    """ Fetch a certain amount of random songs to play. """
-    # List all files in source directory.
-    all_songs = []
-
-    for basedir, _, files in os.walk(config.music_source):
-        # Filter song files.
-        for file in files:
-            if any(file.endswith('.' + ext) for ext in extensions):
-                all_songs.append(path.join(basedir, file))
-
-    # Create random list of uniqe songs.
-    songs = random.sample(all_songs, config.queue_refill_rate)
-    return songs
-
-
-### Main thread.
-
-class AFKStreamThread(threading.Thread):
-    def run(self):
-        global streaming, queue
-        stream_url = 'http://{host}:{port}/{mount}'.format(host=config.stream_host, port=config.stream_port, mount=config.stream_mount)
-
-        while True:
-            data = fetch_stream_data(stream_url)
-
-            # Nobody currently streaming? Let's AFK stream!
-            if not stream_is_playing(data):
-                streaming = True
-            
-            conn = None
-            # Enter streaming loop if we're streaming.
-            while streaming:
-                # Setup connection.
-                if not conn:
-                    conn = create_stream_connection()
-                    event.emit('afkstream.started')
-
-                # Take items from queue and stream them.
-                while streaming and queue:
-                    song = queue.pop()
-                    stream_song(conn, song)
-
-                # If we're still streaming that means the queue has been exhausted. Refill it.
-                if streaming:
-                    queue = fetch_songs(config.music_source, config.music_extensions, config.queue_refill_rate)
-
-            # Close AFK stream connection.
-            if conn:
-                conn.close()
-                event.emit('afkstream.stopped')
-
-            # Sleep for a bit.
-            time.sleep(config.meta_update_interval)
