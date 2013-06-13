@@ -14,8 +14,8 @@ metadata = {}
 
 def identify(bot, user, channel, password):
     if user in config.irc_admins:
-        dj_nick, pass = config.irc_admins[user]
-        if password == pass:
+        dj_nick, dj_pass = config.irc_admins[user]
+        if password == dj_pass:
             bot.admins.append(user)
             bot.respond('identification {b}successful{b}'.format(**irc.commands))
             return
