@@ -28,19 +28,17 @@ def start_streaming():
     global streaming
     streaming = True
 
-event.add_handler('afkstream.start', start_streaming)
-
 def stop_streaming():
     global streaming
     streaming = False
-
-event.add_handler('afkstream.stop', stop_streaming)
 
 def schedule_stop(delay):
     t = threading.Timer(delay, lambda: event.emit('afkstream.stop'))
     t.start()
     event.emit('afkstream.stop_scheduled', delay)
 
+event.add_handler('afkstream.start', start_streaming)
+event.add_handler('afkstream.stop', stop_streaming)
 event.add_handler('afkstream.schedule_stop', schedule_stop)
 
 
@@ -150,7 +148,7 @@ def stream_song(conn, song):
     # Start reading and sending data.
     while streaming:
         data = encoder.stdout.read(config.stream_buffer_size)
-        if not data:
+        if len(data) == 0:
             break
                         
         conn.send(data)

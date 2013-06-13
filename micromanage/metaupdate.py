@@ -103,6 +103,9 @@ class MetaUpdateThread(threading.Thread):
             # Synchronize metadata and info file.
             update_info_file(config.meta_file, metadata)
 
+            # Let the world know of the new metadata.
+            event.emit('metadata.updated', metadata)
+
             # And sleep.
             time.sleep(config.meta_update_interval)
 
