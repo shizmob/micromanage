@@ -38,6 +38,7 @@ class AFKStreamThread(threading.Thread):
         def schedule_stop(delay):
             t = threading.Timer(delay, lambda: event.emit('afkstream.stop'))
             t.start()
+            event.emit('afkstream.stop_scheduled', delay)
         event.add_handler('afkstream.schedule_stop', schedule_stop)
 
 
