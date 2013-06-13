@@ -52,6 +52,8 @@ lame_path = '/usr/bin/lame'
 stream_bitrate = 192
 # Sampling rate to stream at, in Hz.
 stream_samplerate = 44100
+# Delay to wait before disconnecting the stream when manually disconnected.
+stream_disconnect_delay = 30
 
 #### IRC bot options ####
 
