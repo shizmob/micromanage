@@ -14,7 +14,7 @@ class FallbackStreamThread(threading.Thread):
             port=config.stream_input_port,
             mount=config.stream_input_fallback_mount,
             user=config.stream_input_user,
-            pass=config.stream_input_pass,
+            password=config.stream_input_pass,
             name='Fallback',
             description='Sometime things don\'t work out the way we want them to.',
             bitrate=config.stream_bitrate,

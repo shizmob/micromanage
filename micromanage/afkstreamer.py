@@ -76,7 +76,7 @@ class AFKStreamThread(threading.Thread):
                         port=config.stream_input_port,
                         mount=config.stream_input_mount,
                         user=config.stream_input_user,
-                        pass=config.stream_input_pass,
+                        password=config.stream_input_pass,
                         name='AFK Streamer',
                         description='Streaming while DJs are offline',
                         bitrate=config.stream_bitrate,

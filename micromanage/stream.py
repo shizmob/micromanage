@@ -60,7 +60,7 @@ def extract_listeners(annotations):
     return listeners, max_listeners
 
 
-def create_connection(host, port, mount, user, password, name='Stream', description='', bitrate=192, samplerate=44100, format='mp3'):
+def create_connection(host, port, mount, user, password, name='Stream', description='', genre='Various', bitrate=192, samplerate=44100, format='mp3'):
     """ Create source connection to stream. """
     conn = pylibshout.Shout()
 
