@@ -155,14 +155,14 @@ def stream_song(conn, song):
 
 def fetch_songs(source, extensions, count):
     """ Fetch a certain amount of random songs to play. """
-    # Create file filter.
-    filter = re.compile('(' + '|'.join(re.escape('.{ext}'.format(ext=ext)) for ext in extensions) + ')$', re.IGNORECASE)
-
     # List all files in source directory.
     all_songs = []
+
     for basedir, _, files in os.walk(config.music_source):
-        # Filter songs with filter.
-        all_songs.extend(path.join(basedir, file) for file in files if filter.search(file))
+        # Filter song files.
+        for file in files:
+            if any(file.endswith('.' + ext) for ext in extensions):
+                all_songs.append(path.join(basedir, file))
 
     # Create random list of uniqe songs.
     songs = random.sample(all_songs, config.queue_refill_rate)
