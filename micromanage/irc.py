@@ -2,6 +2,7 @@
 # micromanage irc module.
 
 import config
+import sys
 import threading
 from twisted.words.protocols import irc
 from twisted.internet import reactor, protocol, ssl
@@ -63,10 +64,16 @@ def add_handler(command, handler):
 
 class Bot(irc.IRCClient):
     def signedOn(self):
+        # Identify.
+        if config.irc_pass is not None:
+            self.msg('NickServ', 'IDENTIFY {}'.format(config.irc_pass))
+
+        # Auto-join channels.
         for channel in config.irc_channels:
             self.join(channel)
 
     def is_admin(self, user):
+        self.whois(user)
         # TODO: Implement.
         return True
 
@@ -104,4 +111,7 @@ class IRCClientThread(threading.Thread):
             reactor.connectSSL(config.irc_host, config.irc_port, fac, ssl.ClientContextFactory())
         else:
             reactor.connectTCP(config.irc_host, config.irc_port, fac)
+
         reactor.run(installSignalHandlers=0)
+        # If reactor stopped here, we got a quit signal. Kill program.
+        sys.exit(0)

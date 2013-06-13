@@ -1,5 +1,4 @@
 from __init__ import *
-import threading
 
 def main():
     threads = []
@@ -7,6 +6,7 @@ def main():
     # Build threads.
     threads.append(irc.IRCClientThread())
     threads.append(metaupdate.MetaUpdateThread())
+    threads.append(stream.AFKStreamThread())
 
     # Start threads.
     [ thread.start() for thread in threads ]

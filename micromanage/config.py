@@ -13,7 +13,7 @@ stream_mount = 'main.mp3'
 #### Recon options ####
 
 # File to write metadata to.
-meta_file = 'info.json'
+meta_file = '/home/www/r-a-dio/info.json'
 # Time in seconds between metadata updates.
 meta_update_interval = 5
 # Maximum metadata entries.
@@ -24,17 +24,33 @@ meta_cap = 6
 ## Song options.
 # Music directory to AFK stream songs from.
 music_source = '/home/www/r-a-dio/res/music'
-# Song database file. SQLite 3 database format.
-music_db = 'music.sqlite3'
+# Music extensions.
+music_extensions = [ 'mp3', 'ogg' ]
+
+## Stream host options.
+# Stream host when AFK streaming.
+stream_input_host = 'stream.salty-salty-studios.com'
+# Stream port when AFK streaming.
+stream_input_port = 1337
+# Stream mount when AFK streaming.
+stream_input_mount = 'main.mp3'
+# Stream user when AFK streaming.
+stream_input_user = 'source'
+# Stream password when AFK streaming.
+stream_input_pass = None
 
 ## Streaming options.
+# Buffer stream to use.
+stream_buffer_size = 4096
 # Number of items to push to the queue on update.
 queue_refill_rate = 5
 # Format to stream remotely. Currently only mp3 is supported.
 stream_format = 'mp3'
+# Path to LAME binary.
+lame_path = '/usr/bin/lame'
 # Bitrate to stream at, in kb/s.
 stream_bitrate = 192
-# Sampling rate to stream at, in kHz.
+# Sampling rate to stream at, in Hz.
 stream_samplerate = 44100
 
 #### IRC bot options ####
