@@ -12,7 +12,7 @@ metadata = {}
 
 ### IRC command handlers.
 
-def identify(bot, user, channel, password):
+def identify(bot, user, channel, password, *args):
     if user in config.irc_admins:
         dj_nick, dj_pass = config.irc_admins[user]
         if password == dj_pass:
@@ -21,37 +21,37 @@ def identify(bot, user, channel, password):
             return
     bot.respond('identification {b}failed{b}'.format(**irc.commands))
 
-def quit(bot, user, channel, message):
+def quit(bot, user, channel, *args):
     if bot.is_admin(user):
         event.emit('irc.quit')
 
-def url(bot, user, channel, message):
+def url(bot, user, channel, *args):
     url = 'http://{host}:{port}/{mount}'.format(host=config.stream_host, port=config.stream_port, mount=config.stream_mount)
     response = 'stream url: {b}{url}{b}'.format(url=url, **irc.commands)
     bot.respond(user, channel, response)
 
-def show(bot, user, channel, message):
+def show(bot, user, channel, *args):
     show = 'current show: {b}{show}{b}'.format(show=metadata['current'], **irc.commands)
     if metaupdate.metadata['streamer']:
         show += ' with {b}{streamer}{b}'.format(streamer=metadata['streamer'], **irc.commands)
     bot.respond(user, channel, show)
 
-def listeners(bot, user, channel, message):
+def listeners(bot, user, channel, *args):
     response = 'current listeners: {b}{lst}{b} / peak listeners: {b}{plst}{b}'.format(lst=metadata['listeners'], plst=metadata['max_listeners'], **irc.commands)
     bot.respond(user, channel, response)
 
-def now_playing(bot, user, channel, message):
+def now_playing(bot, user, channel, *args):
     song = now_playing.song
     response = 'now playing: {b}{song}{b}'.format(song=song, **irc.commands)
     bot.respond(user, channel, response)
 
 now_playing.song = None
 
-def start_stream(bot, user, channel, message):
+def start_stream(bot, user, channel, *args):
     if bot.is_admin(user):
         event.emit('afkstream.schedule_stop', config.stream_disconnect_delay)
 
-def stop_stream(bot, user, channel, message):
+def stop_stream(bot, user, channel, *args):
     if bot.is_admin(user):
         event.emit('afkstream.start')
 
