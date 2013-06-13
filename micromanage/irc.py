@@ -108,7 +108,8 @@ class Bot(irc.IRCClient):
         global handlers
         if message.startswith(config.irc_command_char):
             message = message[len(config.irc_command_char):]
-            command = message.split(' ', 2)[0]
+            command = message.split(' ', 1)[0]
+            user = user.split('!', 1)[0]
 
             if command in handlers:
                 for handler in handlers[command]:
@@ -137,9 +138,11 @@ class Bot(irc.IRCClient):
         if user not in self.nick_status:
             self.whois(user)
 
-        # Wait until we have fetched registration status.
-        while user not in self.nick_status:
+        # Wait until we have fetched registration status for a maximum of 3 seconds.
+        elapsed = 0.0
+        while user not in self.nick_status and elapsed < 3.0:
             time.sleep(0.1)
+            elapsed += 0.1
 
         return self.nick_status[user]
 
