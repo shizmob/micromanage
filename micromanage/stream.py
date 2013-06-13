@@ -204,8 +204,8 @@ class AFKStreamThread(threading.Thread):
 
             # Close AFK stream connection.
             if conn:
-                event.emit('afkstream.stopped')
                 conn.close()
+                event.emit('afkstream.stopped')
 
             # Sleep for a bit.
             time.sleep(config.meta_update_interval)
