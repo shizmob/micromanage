@@ -1,0 +1,9 @@
+Twisted==13.0.0
+argparse==1.2.1
+beautifulsoup4==4.2.1
+lxml==3.2.1
+pyOpenSSL==0.13
+-e git+https://github.com/Wessie/pylibshout.git@281fac7432c109b5988ef997834d9c175052da19#egg=pylibshout-dev
+tagpy==2013.1
+wsgiref==0.1.2
+zope.interface==4.0.5

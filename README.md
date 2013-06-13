@@ -5,6 +5,7 @@ An AFK streamer, IRC bot and metadata updater.
 
 Usage
 -----
+Install the requirements (`pip -r requirements.txt`).
 Edit `micromanage/config.py` and start it by executing `python micromanage`.
 
 Requirements
