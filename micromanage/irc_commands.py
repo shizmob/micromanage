@@ -23,7 +23,7 @@ def start_stream(bot, user, channel, message):
     if bot.is_admin(user):
         t = threading.Timer(config.stream_disconnect_delay, lambda: setattr(stream, 'streaming', False))
         t.start()
-        response = 'disconnecting AFK streamer after {b}{delay}{b} seconds.'.format(config.stream_disconnect_delay, **irc.commands)
+        response = 'disconnecting AFK streamer after {b}{delay}{b} seconds.'.format(delay=config.stream_disconnect_delay, **irc.commands)
         bot.respond(user, channel, response)
 irc.add_handler('startstream', start_stream)
 
