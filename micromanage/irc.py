@@ -59,12 +59,12 @@ commands = {
     'lgray': '\x0315'
 }
 
+
 def add_handler(command, handler):
     global handlers
     if command not in handlers:
         handlers[command] = []
     handlers[command].append(handler)
-
 
 class Bot(irc.IRCClient):
     def signedOn(self):
@@ -100,13 +100,13 @@ class Bot(irc.IRCClient):
                     except Exception as e:
                         self.respond(user, channel, '{b}Error while executing {cmd}:{b} {type} - {error}'.format(type=e.__class__.__name__, error=e, cmd=handler.__name__, **commands))
 
-
 class BotFactory(protocol.ClientFactory):
     def buildProtocol(self, addr):
         global bot
         bot = Bot()
         bot.nickname = config.irc_nick
         return bot
+
 
 class IRCClientThread(threading.Thread):
     def run(self):
