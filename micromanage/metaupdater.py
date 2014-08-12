@@ -10,6 +10,9 @@ import event
 import stream
 
 metadata = {}
+afk_streaming = False
+afk_song = None
+
 
 ### Functions.
 
@@ -21,12 +24,29 @@ def update_info_file(file, metadata):
     with open(file, 'w') as f:
         json.dump(metadata, f)
 
+def afk_start():
+    global afk_streaming
+    afk_streaming = True
+
+def afk_stop():
+    global afk_streaming
+    afk_streaming = False
+
+def afk_set_playing(song):
+    global afk_song
+    afk_song = song
+
+event.add_handler('afkstream.start', afk_start)
+event.add_handler('afkstream.stop', afk_stop)
+event.add_handler('afkstream.show', afk_set_playing)
+event.add_handler('afkstream.playing', afk_set_playing)
+
 
 ### Main thread.
 
 class MetaUpdateThread(threading.Thread):
     def run(self):
-        global metadata
+        global metadata, afk_streaming, afk_song
         history = []
 
         # Get initial data from info file.
@@ -52,6 +72,10 @@ class MetaUpdateThread(threading.Thread):
                 metadata['max_listeners'] = max_listeners
             elif 'max_listeners' not in metadata:
                 metadata['max_listeners'] = 0
+
+            # Get song from AFK streamer.
+            if afk_streaming and afk_song:
+                song = afk_song
 
             # Did we encounter a new song? Push it.
             if song and (not history or history[0] != song):

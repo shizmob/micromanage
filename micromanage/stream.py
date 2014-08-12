@@ -137,7 +137,7 @@ def create_encoder(song):
     encoder = subprocess.Popen(cmdline, stdout=subprocess.PIPE)
     return encoder
 
-def stream_song(conn, song, cond=None, traktor_sheet=None, announce_event=None):
+def stream_song(conn, song, cond=None, traktor_sheet=None, announce_event=None, track_event=None):
     """ Stream a song file to source stream connection. """
  
     # Retrieve tags and notify stream.
@@ -149,18 +149,26 @@ def stream_song(conn, song, cond=None, traktor_sheet=None, announce_event=None):
         event.emit(announce_event, name)
     
     # Parse Traktor sheet.
+    tracklist = []
     if traktor_sheet:
         tracklist = extract_traktor_sheet_tracks(traktor_sheet)
-
+    
     # Setup an encoder to stream format.
     encoder = create_encoder(song)
 
     # Start reading and sending data.
+    start_time = datetime.datetime.now()
     while cond is None or cond.is_set():
         data = encoder.stdout.read(config.stream_buffer_size)
         if len(data) == 0:
             break
-                        
+
+        now = datetime.datetime.now()
+        if tracklist and (now - start_time) >= tracklist[0][0]:
+            song, start = tracklist.pop(0)
+            if track_event:
+                events.emit(track_event, song)
+                      
         conn.send(data)
         conn.sync()
 

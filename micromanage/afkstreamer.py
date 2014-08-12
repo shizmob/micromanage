@@ -96,7 +96,7 @@ class AFKStreamThread(threading.Thread):
                         if path.exists(sheetfile):
                              sheet = sheetfile
 
-                    stream.stream_song(conn, song, traktor_sheet=sheet, cond=streaming, announce_event='afkstream.playing')
+                    stream.stream_song(conn, song, traktor_sheet=sheet, cond=streaming, announce_event='afkstream.show', track_event='afkstream.playing')
 
                 # If we're still streaming that means the queue has been exhausted. Refill it.
                 if streaming.is_set():

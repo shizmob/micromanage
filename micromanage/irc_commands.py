@@ -111,6 +111,6 @@ def metadata_updated(meta):
 event.add_handler('afkstream.stop_scheduled', afkstream_stop_scheduled)
 event.add_handler('afkstream.started', afkstream_started)
 event.add_handler('afkstream.stopped', afkstream_stopped)
-event.add_handler('afkstream.playing', afkstream_playing)
+event.add_handler('afkstream.show', afkstream_playing)
 event.add_handler('stream.playing', stream_playing)
 event.add_handler('metadata.updated', metadata_updated)
