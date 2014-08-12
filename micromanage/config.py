@@ -26,6 +26,8 @@ meta_cap = 6
 music_source = '/home/www/r-a-dio/res/music'
 # Music extensions.
 music_extensions = [ 'mp3', 'ogg' ]
+# Use Traktor HTML sheet for track reference?
+use_traktor_sheets = True
 # The fallback song.
 fallback_song = '/home/www/r-a-dio/res/music/bright_slap_f.mp3'
 
@@ -77,5 +79,5 @@ irc_channels = [ '#sigmaloop' ]
 irc_notification_channels = [ '#sigmaloop' ]
 # IRC command character.
 irc_command_char = '$'
-# Administrative users. Need to be registered nicknames. A nickname -> DJ name mapping.
+# Administrative users. Need to be registered nicknames. A nickname -> (DJ name, password) mapping.
 irc_admins = { 'Shiz': ('Shiz', ''), 'Delta_Kurshiva': ('Delta', '') }

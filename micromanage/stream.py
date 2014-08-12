@@ -59,6 +59,28 @@ def extract_listeners(annotations):
 
     return listeners, max_listeners
 
+def extract_traktor_sheet_tracks(file):
+    """ Extract a list of (track, offset) tuples from Traktor sheet file. """
+    tracks = []
+
+    with open(file, 'r') as f:
+        data = bs4.BeautifulSoup(f)
+
+        start_time = None
+        for entry in data.tr:
+            track, artist, time, duration = (x.string for x in entry.td)
+            if artist:
+                track = artist + ' - ' + track
+
+            time = datetime.datetime.strptime(time, '%Y/%m/%d %H:%M:%s')
+            if not start_time:
+                start_time = time
+
+            tracks.append((track, time - start_time))
+
+    return tracks
+
+
 
 def create_connection(host, port, mount, user, password, name='Stream', description='', genre='Various', bitrate=192, samplerate=44100, format='mp3'):
     """ Create source connection to stream. """
@@ -110,7 +132,7 @@ def create_encoder(song):
     encoder = subprocess.Popen(cmdline, stdout=subprocess.PIPE)
     return encoder
 
-def stream_song(conn, song, cond=None, announce_event=None):
+def stream_song(conn, song, cond=None, traktor_sheet=None, announce_event=None):
     """ Stream a song file to source stream connection. """
  
     # Retrieve tags and notify stream.
@@ -120,6 +142,10 @@ def stream_song(conn, song, cond=None, announce_event=None):
     # Also notify other interested parties.
     if announce_event:
         event.emit(announce_event, name)
+    
+    # Parse Traktor sheet.
+    if traktor_sheet:
+        tracklist = extract_traktor_sheet_tracks(traktor_sheet)
 
     # Setup an encoder to stream format.
     encoder = create_encoder(song)

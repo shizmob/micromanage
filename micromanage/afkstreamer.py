@@ -87,7 +87,16 @@ class AFKStreamThread(threading.Thread):
                 # Take items from queue and stream them.
                 while streaming.is_set() and queue:
                     song = queue.pop()
-                    stream.stream_song(conn, song, cond=streaming, announce_event='afkstream.playing')
+                    sheet = None
+
+                    if config.use_traktor_sheet:
+                        sheetfile = song
+                        for ext in config.music_extensions:
+                            sheetfile = sheetfile.replace('.' + ext, '.html')
+                        if path.exists(sheetfile):
+                             sheet = sheetfile
+
+                    stream.stream_song(conn, song, traktor_sheet=sheet, cond=streaming, announce_event='afkstream.playing')
 
                 # If we're still streaming that means the queue has been exhausted. Refill it.
                 if streaming.is_set():
