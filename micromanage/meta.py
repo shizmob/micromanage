@@ -15,7 +15,7 @@ def extract_song_name(song, tags):
 
     # Try $artist - $title.
     if tags.artist and tags.title:
-        metadata = '{} - {}'.format(tags.artist, tags.title)
+        metadata = u'{} - {}'.format(tags.artist, tags.title)
     # Or, just $title.
     elif tags.title:
         metadata = tags.title

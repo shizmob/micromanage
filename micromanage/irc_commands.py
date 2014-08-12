@@ -108,9 +108,9 @@ def afkstream_playing(song):
     if not irc.bot or not irc.bot.connected:
        return
 
-    msg = 'now starting: {b}{song}{b}'.format(song=song, **irc.commands)
+    msg = u'now starting: {b}{song}{b}'.format(song=song, **irc.commands)
     for channel in config.irc_notification_channels:
-        irc.bot.msg(channel, msg)
+        irc.bot.msg(channel, msg.encode('utf-8'))
 
 def stream_playing(song):
     now_playing.song = song
