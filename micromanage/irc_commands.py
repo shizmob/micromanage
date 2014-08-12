@@ -33,10 +33,17 @@ def url(bot, user, channel, *args):
     bot.respond(user, channel, response)
 
 def show(bot, user, channel, *args):
-    show = 'current show: {b}{show}{b}'.format(show=metadata['current'], **irc.commands)
+    if args and bot.is_admin(user):
+        event.emit('metadata.show', ' '.join(args))
+
+    show = u'current show: {b}{show}{b}'.format(show=metadata['current'], **irc.commands)
     if metadata['streamer']:
-        show += ' with {b}{streamer}{b}'.format(streamer=metadata['streamer'], **irc.commands)
-    bot.respond(user, channel, show)
+        show += u' with {b}{streamer}{b}'.format(streamer=metadata['streamer'], **irc.commands)
+    bot.respond(user, channel, show.encode('utf-8'))
+
+def dj(bot, user, channel, *args):
+    if bot.is_admin(user):
+        event.emit('metadata.dj', ' '.join(args))
 
 def listeners(bot, user, channel, *args):
     response = 'current listeners: {b}{lst}{b} / peak listeners: {b}{plst}{b}'.format(lst=metadata['listeners'], plst=metadata['max_listeners'], **irc.commands)
@@ -62,6 +69,7 @@ irc.add_handler('identify', identify)
 irc.add_handler('quit', quit)
 irc.add_handler('url', url)
 irc.add_handler('show', show)
+irc.add_handler('dj', dj)
 irc.add_handler('listeners', listeners)
 irc.add_handler('np', now_playing)
 irc.add_handler('startstream', start_stream)
