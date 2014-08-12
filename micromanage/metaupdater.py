@@ -14,15 +14,14 @@ afk_streaming = False
 afk_song = None
 
 
-### Functions.
+### Events.
+def update_show(title):
+    global metadata
+    metadata['current'] = title
 
-def read_info_file(file):
-    with open(file, 'r') as f:
-        return json.load(f)
-
-def update_info_file(file, metadata):
-    with open(file, 'w') as f:
-        json.dump(metadata, f)
+def update_dj(dj):
+    global metadata
+    metadata['streamer'] = dj
 
 def afk_start():
     global afk_streaming
@@ -36,10 +35,23 @@ def afk_set_playing(song):
     global afk_song
     afk_song = song
 
+event.add_handler('metadata.show', update_show)
+event.add_handler('metadata.dj', update_dj)
 event.add_handler('afkstream.start', afk_start)
 event.add_handler('afkstream.stop', afk_stop)
 event.add_handler('afkstream.show', afk_set_playing)
 event.add_handler('afkstream.playing', afk_set_playing)
+
+
+### Functions.
+
+def read_info_file(file):
+    with open(file, 'r') as f:
+        return json.load(f)
+
+def update_info_file(file, metadata):
+    with open(file, 'w') as f:
+        json.dump(metadata, f)
 
 
 ### Main thread.
