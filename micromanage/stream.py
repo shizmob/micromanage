@@ -164,7 +164,7 @@ def stream_song(conn, song, cond=None, traktor_sheet=None, announce_event=None, 
             break
 
         now = datetime.datetime.now()
-        if tracklist and (now - start_time) >= tracklist[0][0]:
+        if tracklist and (now - start_time) >= tracklist[0][1]:
             song, start = tracklist.pop(0)
             if track_event:
                 events.emit(track_event, song)
