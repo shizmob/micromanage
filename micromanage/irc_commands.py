@@ -64,6 +64,9 @@ def stop_stream(bot, user, channel, *args):
     if bot.is_admin(user):
         event.emit('afkstream.start')
 
+def kill(bot, user, channel, *args):
+    if bot.is_admin(user):
+        event.emit('afkstream.stop')
 
 irc.add_handler('identify', identify)
 irc.add_handler('quit', quit)
@@ -74,6 +77,7 @@ irc.add_handler('listeners', listeners)
 irc.add_handler('np', now_playing)
 irc.add_handler('startstream', start_stream)
 irc.add_handler('stopstream', stop_stream)
+irc.add_handler('kill', kill0
 
 
 ### Event handlers.
