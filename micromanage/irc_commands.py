@@ -59,6 +59,8 @@ now_playing.song = None
 def start_stream(bot, user, channel, *args):
     if bot.is_admin(user):
         event.emit('afkstream.schedule_stop', config.stream_disconnect_delay)
+        event.emit('metadata.show', ' '.join(args))
+        event.emit('metadata.dj', config.irc_admins[user][0])
 
 def stop_stream(bot, user, channel, *args):
     if bot.is_admin(user):
@@ -77,7 +79,7 @@ irc.add_handler('listeners', listeners)
 irc.add_handler('np', now_playing)
 irc.add_handler('startstream', start_stream)
 irc.add_handler('stopstream', stop_stream)
-irc.add_handler('kill', kill0
+irc.add_handler('kill', kill)
 
 
 ### Event handlers.
