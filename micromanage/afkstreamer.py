@@ -61,12 +61,18 @@ class AFKStreamThread(threading.Thread):
         global streaming, queue
         stream_url = 'http://{host}:{port}/{mount}'.format(host=config.stream_host, port=config.stream_port, mount=config.stream_mount)
 
+        takeover_counter = 0
         while True:
             data = stream.fetch_data(stream_url)
 
             # Nobody currently streaming? Let's AFK stream!
             if not stream.is_playing(data):
-                streaming.set()
+                takeover_counter += 1
+                if takeover_counter >= config.takeover_treshold:
+                    takeover_counter = 0
+                    event.emit('afkstream.start')
+            else:
+                takeover_counter = 0
             
             conn = None
             # Enter streaming loop if we're streaming.
