@@ -20,6 +20,8 @@ queue = []
 def start_streaming():
     global streaming
     streaming.set()
+    event.emit('metadata.show', 'AFK stream')
+    event.emit('metadata.dj', None)
 
 def stop_streaming():
     global streaming
