@@ -116,4 +116,4 @@ class AFKStreamThread(threading.Thread):
                 event.emit('afkstream.stopped')
 
             # Sleep for a bit.
-            time.sleep(config.meta_update_interval)
+            time.sleep(config.takeover_interval)

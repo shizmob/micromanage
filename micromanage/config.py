@@ -18,6 +18,10 @@ meta_file = '/home/www/r-a-dio/info.json'
 meta_update_interval = 5
 # Maximum metadata entries.
 meta_cap = 6
+# Time between takeover checks.
+takeover_interval = 5
+# Maximum subsequent failed takeover check before takeover by AFK streamer.
+takeover_treshold = 3
 
 #### AFK streaming options ####
 
