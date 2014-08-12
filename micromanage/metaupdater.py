@@ -37,6 +37,7 @@ def afk_set_playing(song):
 
 event.add_handler('metadata.show', update_show)
 event.add_handler('metadata.dj', update_dj)
+event.add_handler('afkstream.show', update_show)
 event.add_handler('afkstream.start', afk_start)
 event.add_handler('afkstream.stop', afk_stop)
 event.add_handler('afkstream.show', afk_set_playing)
