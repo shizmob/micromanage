@@ -5,6 +5,7 @@ from __future__ import division
 import subprocess
 import threading
 import urllib
+import datetime
 
 import bs4
 import pylibshout
@@ -67,12 +68,16 @@ def extract_traktor_sheet_tracks(file):
         data = bs4.BeautifulSoup(f)
 
         start_time = None
-        for entry in data.tr:
-            track, artist, time, duration = (x.string for x in entry.td)
+        for entry in data.find_all('tr')[1:]:
+            meta = entry.find_all('td')
+            if not meta:
+                continue
+
+            track, artist, time, duration = (x.string for x in meta)
             if artist:
                 track = artist + ' - ' + track
 
-            time = datetime.datetime.strptime(time, '%Y/%m/%d %H:%M:%s')
+            time = datetime.datetime.strptime(time, '%Y/%m/%d %H:%M:%S')
             if not start_time:
                 start_time = time
 
