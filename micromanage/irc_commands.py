@@ -51,8 +51,8 @@ def listeners(bot, user, channel, *args):
 
 def now_playing(bot, user, channel, *args):
     song = now_playing.song
-    response = 'now playing: {b}{song}{b}'.format(song=song, **irc.commands)
-    bot.respond(user, channel, response)
+    response = u'now playing: {b}{song}{b}'.format(song=song, **irc.commands)
+    bot.respond(user, channel, response.encode('utf-8'))
 
 now_playing.song = None
 
