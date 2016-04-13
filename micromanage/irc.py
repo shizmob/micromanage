@@ -128,13 +128,12 @@ class Bot(irc.IRCClient):
         else:
             self.msg(channel, message)
 
-class BotFactory(protocol.ClientFactory):
+class BotFactory(protocol.ReconnectingClientFactory):
     def buildProtocol(self, addr):
         global bot
         bot = Bot()
         bot.nickname = config.irc_nick
         return bot
-
 
 class IRCClientThread(threading.Thread):
     def run(self):

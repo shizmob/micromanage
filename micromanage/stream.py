@@ -44,6 +44,8 @@ def extract_annotations(data):
 
     if data.annotation:
         for line in data.annotation.string.split('\n'):
+            if ':' not in line:
+                continue
             key, value = line.split(':', 2)
             annotations[key] = value.strip()
 
@@ -73,11 +75,18 @@ def extract_traktor_sheet_tracks(file):
             if not meta:
                 continue
 
-            track, artist, time, duration = (x.string for x in meta)
+            try:
+                track, artist, time, duration = (x.string for x in meta)
+            except:
+                return []
+
             if artist:
                 track = artist + ' - ' + track
 
-            time = datetime.datetime.strptime(time, '%Y/%m/%d %H:%M:%S')
+            try:
+                time = datetime.datetime.strptime(time, '%Y/%m/%d %H:%M:%S')
+            except:
+                return []
             if not start_time:
                 start_time = time
 
@@ -151,7 +160,10 @@ def stream_song(conn, song, cond=None, traktor_sheet=None, announce_event=None, 
     # Parse Traktor sheet.
     tracklist = []
     if traktor_sheet:
-        tracklist = extract_traktor_sheet_tracks(traktor_sheet)
+        try:
+            tracklist = extract_traktor_sheet_tracks(traktor_sheet)
+        except:
+            pass
     
     # Setup an encoder to stream format.
     encoder = create_encoder(song)
