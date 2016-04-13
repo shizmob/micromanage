@@ -3,6 +3,7 @@
 # micromanage standard irc commands
 
 import sys
+from os import path
 
 import config
 import irc
@@ -121,6 +122,22 @@ def metadata_updated(meta):
     global metadata
     metadata = meta
 
+def recording_started(file, playlist):
+    if not irc.bot or not irc.bot.connected:
+       return
+
+    msg = u'recording stream to {b}{file}{b}...'.format(file=path.basename(file), **irc.commands)
+    for channel in config.irc_notification_channels:
+        irc.bot.msg(channel, msg.encode('utf-8'))
+
+def recording_stopped():
+    if not irc.bot or not irc.bot.connected:
+       return
+
+    msg = u'recording {b}finished{b}.'.format(**irc.commands)
+    for channel in config.irc_notification_channels:
+        irc.bot.msg(channel, msg.encode('utf-8'))    
+
 
 event.add_handler('afkstream.stop_scheduled', afkstream_stop_scheduled)
 event.add_handler('afkstream.started', afkstream_started)
@@ -128,3 +145,5 @@ event.add_handler('afkstream.stopped', afkstream_stopped)
 event.add_handler('afkstream.show', afkstream_playing)
 event.add_handler('stream.playing', stream_playing)
 event.add_handler('metadata.updated', metadata_updated)
+event.add_handler('recorder.on', recording_started)
+event.add_handler('recorder.off', recording_stopped)

@@ -2,6 +2,7 @@
 # micromanage module.
 
 import afkstreamer
+import recorder
 import config
 import event
 import fallback

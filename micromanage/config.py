@@ -23,6 +23,11 @@ takeover_interval = 5
 # Maximum subsequent failed takeover check before takeover by AFK streamer.
 takeover_treshold = 3
 
+#### Recording options ####
+
+# Path to write recordings to.
+recording_path = '/home/www/r-a-dio/music'
+
 #### AFK streaming options ####
 
 ## Song options.
@@ -51,9 +56,9 @@ stream_input_pass = None
 
 ## Streaming options.
 # Buffer stream to use.
-stream_buffer_size = 4096
+stream_buffer_size = 32768
 # Number of items to push to the queue on update.
-queue_refill_rate = 5
+queue_refill_rate = 15
 # Format to stream remotely. Currently only mp3 is supported.
 stream_format = 'mp3'
 # Path to LAME binary.

@@ -14,6 +14,76 @@ import config
 import event
 import meta
 
+
+### Traktor sheet stuff.
+
+TRAKTOR_SHEET_PRELUDE = """
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<style type="text/css">
+<!--
+body { margin: 10px; }
+body, th, td, p, div, li {
+font-family: Verdana, Arial, Helvetica, sans-serif;
+font-size: 11px;
+}
+h1 {
+font-size: 18px;
+font-weight: bold;
+}
+table.border {
+border: 1px solid #666666;
+border-collapse: collapse;
+}
+th {
+font-weight: bold;
+vertical-align: top;
+padding: 5px;
+text-align: left;
+background: #990000;
+border-right: 1px solid #FFFFFF;
+color: #FFFFFF;
+}
+td {
+vertical-align: top;
+padding: 5px;
+text-align: left;
+border-top: 1px solid #666666;
+border-right: 1px solid #666666;
+}
+td.key {
+background: #CCCCCC;
+font-weight: bold;
+}
+-->
+</style>
+<?xml version="1.0" encoding="UTF-8" standalone="no" ?>
+<html>
+
+  <head>
+    <title>Track List HISTORY</title>
+    <meta content="text/html; charset=utf-8" http-equiv="Content-Type"/>
+  </head>
+
+  <body bgcolor="#ffffff">
+    <h1>Track List: HISTORY</h1>
+    <table cellpadding="0" cellspacing="0" class="border" width="800px">
+      <tr>
+        <th>Title</th>
+        <th>Artist</th>
+        <th>Start Time</th>
+        <th>Duration</th>
+      </tr>
+"""
+
+TRAKTOR_SHEET_FINALE = """
+    </table>
+  </body>
+
+</html>
+"""
+
+
 ### Functions.
 
 def fetch_data(url):
@@ -62,14 +132,30 @@ def extract_listeners(annotations):
 
     return listeners, max_listeners
 
-def extract_traktor_sheet_tracks(file):
-    """ Extract a list of (track, offset) tuples from Traktor sheet file. """
+def write_traktor_sheet(file, tracks):
+    """ Write a Traktor sheet file from a bunch of tracks and offsets. """
+    with open(file, 'w') as f:
+        f.write(TRAKTOR_SHEET_PRELUDE)
+
+        for i, (title, time) in enumerate(tracks):
+             if i + 1 < len(tracks):
+                 duration = (tracks[i + 1][1] - time).total_seconds()
+                 duration = '{:02d}:{:02d}'.format(int(duration / 60), int(duration) % 60)
+             else:
+                 duration = ''
+
+             time = datetime.datetime.strftime(time, '%Y/%m/%d %H:%M:%S')
+             f.write("<tr><td>{}</td><td></td><td>{}</td><td>{}</td>\n".format(title, time, duration))
+
+        f.write(TRAKTOR_SHEET_FINALE)
+
+def parse_traktor_sheet(file):
+    """ Extract a list of (track, time) tuples from Traktor sheet file. """
     tracks = []
 
     with open(file, 'r') as f:
         data = bs4.BeautifulSoup(f)
 
-        start_time = None
         for entry in data.find_all('tr')[1:]:
             meta = entry.find_all('td')
             if not meta:
@@ -87,10 +173,19 @@ def extract_traktor_sheet_tracks(file):
                 time = datetime.datetime.strptime(time, '%Y/%m/%d %H:%M:%S')
             except:
                 return []
-            if not start_time:
-                start_time = time
+            tracks.append((track, time, duration))
 
-            tracks.append((track, time - start_time))
+    return tracks
+
+def extract_traktor_sheet_tracks(file):
+    """ Extract a list of (track, offset) tuples from Traktor sheet file. """
+    tracks = []
+    start_time = None
+
+    for (track, time, duration) in parse_traktor_sheet(file):
+        if not start_time:
+            start_time = time
+        tracks.append((track, time - start_time))
 
     return tracks
 
