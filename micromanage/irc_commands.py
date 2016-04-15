@@ -130,7 +130,7 @@ def recording_started(file, playlist):
     for channel in config.irc_notification_channels:
         irc.bot.msg(channel, msg.encode('utf-8'))
 
-def recording_stopped():
+def recording_stopped(file, playlist):
     if not irc.bot or not irc.bot.connected:
        return
 

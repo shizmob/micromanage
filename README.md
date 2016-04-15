@@ -17,6 +17,7 @@ Requirements
   - BeautifulSoup
   - pylibshout
   - tagpy
+* fIcy
 
 In order for stream takeover by the AFK streamer to work properly, an Icecast proxy like [icecast-proxy-go](https://github.com/Wessie/icecast-proxy-go.git) is required.
 

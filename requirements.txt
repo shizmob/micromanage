@@ -7,4 +7,3 @@ pyOpenSSL==0.13
 tagpy==2013.1
 wsgiref==0.1.2
 zope.interface==4.0.5
-requests

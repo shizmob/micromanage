@@ -1,8 +1,10 @@
+import os
 from os import path
 from datetime import datetime
 import time
 import threading
-import requests
+import subprocess
+import signal
 
 import tagpy
 
@@ -12,9 +14,9 @@ import stream
 
 recording = threading.Event()
 new_song = threading.Event()
-current_song = None
 current_title = None
 current_dj = None
+current_song = None
 afk_stream_delay = 0
 
 
@@ -22,10 +24,12 @@ def mark_afk_stream(n):
     global afk_stream_delay
     afk_stream_delay = n
 
+def update_song(title):
+    global current_song
+    current_song = title
+
 def update_title(title):
     global current_title
-    if title == current_title:
-        return
     current_title = title
 
 def update_dj(dj):
@@ -39,18 +43,10 @@ def update_dj(dj):
         recording.set()
     current_dj = dj
 
-def update_song(title):
-    global current_song
-    if title == current_song:
-        return
-
-    current_song = title
-    new_song.set()
-
 def update_metadata(meta):
     update_title(meta['current'])
     update_dj(meta['streamer'])
-    update_song(meta['last'][0])
+    update_song(meta['current_song'])
 
 event.add_handler('afkstream.schedule_stop', mark_afk_stream)
 event.add_handler('metadata.title', update_title)
@@ -78,6 +74,7 @@ class StreamRecordThread(threading.Thread):
             target = base + '.mp3'
             playlist = base + '.html'
             mode = 'w'
+            blacklist = [current_song]
 
             # See if we need to append to an existing interrupted stream or not.
             if path.exists(target):
@@ -92,28 +89,30 @@ class StreamRecordThread(threading.Thread):
                         tracklist = [(track, t) for (track, t, duration) in stream.parse_traktor_sheet(playlist)]
 
             rec = open(target, mode + 'b')
+            recorder = subprocess.Popen(['fIcy', '-t', url], stdout=rec, stderr=subprocess.PIPE)
+            stream.write_traktor_sheet(playlist, tracklist)
             event.emit('recorder.on', target, playlist)
 
             # Record the stream.
             while recording.is_set():
-                inp = requests.get(url, stream=True)
-
-                # Record contents.
-                for chunk in inp.iter_content():
-                    if not recording.is_set():
-                        break
-
-                    if new_song.is_set():
-                        tracklist.append((current_song, datetime.now()))
+                line = recorder.stderr.readline().decode('utf-8')
+                if not recording.is_set() or not line:
+                    break
+                if line.startswith('playing #'):
+                    _, song = line.split(':', 1)
+                    song = song.strip()
+                    if song not in blacklist:
+                        tracklist.append((song.strip(), datetime.now()))
                         stream.write_traktor_sheet(playlist, tracklist)
-                        new_song.clear()
 
-                    rec.write(chunk)
-
-                inp.close()
-
-            recording.clear()
+            recorder.send_signal(signal.SIGINT)
+            recorder.wait()
             rec.close()
+            recording.clear()
+            event.emit('recorder.off', target, playlist)
+
+            # Fix-up files.
+            subprocess.call(['fResync', '-b', target])
 
             # Finalize tracklist.
             tracklist.append(('-- end --', datetime.now()))
@@ -127,5 +126,3 @@ class StreamRecordThread(threading.Thread):
             tags.year = datetime.now().year
             tags.comment = 'as played on SIGMA LOOP - http://stream.salty-salty-studios.com'
             tagfile.save()
-
-            event.emit('recorder.off')
